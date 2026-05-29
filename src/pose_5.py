@@ -78,6 +78,30 @@ def minimize_errors(graph, initial_estimate, pose_options):
 
     # TODO: create a list of errors (each index corresponds to a pose) and add the error of each pose to the list
     list_of_errors = []
+    
+    
+    initial_poses = gtsam.utilities.allPose2s(initial_estimate)
+    optimized_poses = gtsam.utilities.allPose2s(result)
+
+
+    # for i in range(1,4):
+    #     factor = graph.at(i)
+    #     list_of_errors.append(factor.error(result))
+
+    for i in range(1, 4):
+        key = X(i)
+
+        pose = initial_poses.atPose2(key)
+        pred_pose = optimized_poses.atPose2(key)
+
+        pose_error_vector = pose.localCoordinates(pred_pose)
+        pose_error = np.linalg.norm(pose_error_vector)
+        
+        list_of_errors.append(pose_error)
+
+    # Debug
+    print(list_of_errors) 
+
     # TODO: compute the sum of the errors and return it along with the best pose and landmark
-    sum_of_errors = 0
+    sum_of_errors = sum(list_of_errors)
     return best_pose, best_landmark, sum_of_errors 
